@@ -3,7 +3,7 @@
 import argparse
 import importlib
 import logging
-import pathlib
+import os
 
 import data
 
@@ -32,14 +32,15 @@ def run(args):
     logger.info("Running script at {}".format(mod_name))
 
     try:
-        importlib.import_module(mod_name)
+        mod = importlib.import_module(mod_name)
     except Exception as e:
         logger.exception(e)
         logger.error("Uhoh, the script halted with an error.")
 
 def path(d):
     try:
-        return importlib.util.find_spec(d).name
+        assert os.path.isdir(d)
+        return d
     except Exception as e:
         raise argparse.ArgumentTypeError("Example {} cannot be located.".format(d))
 
