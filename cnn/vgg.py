@@ -1,39 +1,48 @@
 #! python3
 
-def build(in_placeholder):
-    print(in_placeholder.get_shape())
-    assert in_placeholder.get_shape() == (None, 32, 32, 3)
-    
-    conv1_1 = conv_layer(bgr, "conv1_1")
-    conv1_2 = conv_layer(conv1_1, "conv1_2")
-    pool1 = max_pool(conv1_2, 'pool1')
+"""
+Modified VGG suitable for CIFAR-10
 
-    conv2_1 = conv_layer(pool1, "conv2_1")
-    conv2_2 = conv_layer(conv2_1, "conv2_2")
-    pool2 = max_pool(conv2_2, 'pool2')
+"""
 
-    conv3_1 = conv_layer(pool2, "conv3_1")
-    conv3_2 = conv_layer(conv3_1, "conv3_2")
-    conv3_3 = conv_layer(conv3_2, "conv3_3")
-    pool3 = max_pool(conv3_3, 'pool3')
+import logging
 
-    conv4_1 = conv_layer(pool3, "conv4_1")
-    conv4_2 = conv_layer(conv4_1, "conv4_2")
-    conv4_3 = conv_layer(conv4_2, "conv4_3")
-    pool4 = max_pool(conv4_3, 'pool4')
+import tensorflow as tf
 
-    conv5_1 = conv_layer(pool4, "conv5_1")
-    conv5_2 = conv_layer(conv5_1, "conv5_2")
-    conv5_3 = conv_layer(conv5_2, "conv5_3")
-    pool5 = max_pool(conv5_3, 'pool5')
+logger = logging.getLogger(__name__)
 
-    fc6 = fc_layer(pool5, "fc6")
-    assert fc6.get_shape().as_list()[1:] == [4096]
-    relu6 = tf.nn.relu(fc6)
+def build(x):
+    assert str(x.get_shape()) == "(?, 32, 32, 3)"
+    logger.info("Building VGG model")
 
-    fc7 = fc_layer(relu6, "fc7")
-    relu7 = tf.nn.relu(fc7)
+    log = lambda x: logger.info("\t{}\t{}".format(x.get_shape(), x.name))
 
-    fc8 = fc_layer(relu7, "fc8")
+    log(x)
+    with tf.variable_scope('conv1'):
+        x = tf.layers.conv2d(x, 64, (3, 3), activation=tf.nn.relu, name="conv1_1")
+        x = tf.layers.conv2d(x, 64, (1, 1), activation=tf.nn.relu, name="conv1_2")
+        x = tf.layers.max_pooling2d(x, (2, 2), (2, 2), name="pool1")
 
-    prob = tf.nn.softmax(fc8, name="prob")
+    log(x)
+    with tf.variable_scope('conv2'):
+        x = tf.layers.conv2d(x, 128, (3, 3), activation=tf.nn.relu, name="conv2_1")
+        x = tf.layers.conv2d(x, 128, (1, 1), activation=tf.nn.relu, name="conv2_2")
+        x = tf.layers.max_pooling2d(x, (2, 2), (2, 2), name="pool2")
+
+    log(x)
+    with tf.variable_scope('conv3'):
+        x = tf.layers.conv2d(x, 256, (3, 3), activation=tf.nn.relu, name="conv3_1")
+        x = tf.layers.conv2d(x, 256, (2, 2), activation=tf.nn.relu, name="conv3_2")
+        x = tf.layers.max_pooling2d(x, (2, 2), (2, 2), name="pool3")
+
+    log(x)
+    x = tf.layers.dense(x, 1024, activation=tf.nn.relu, name="fc4")
+
+    log(x)
+    x = tf.layers.dense(x, 256, activation=tf.nn.relu, name="fc5")
+
+    log(x)
+    x = tf.layers.dense(x, 10, activation=tf.nn.relu, name="fc6")
+
+    log(x)
+    return x
