@@ -44,5 +44,9 @@ def build(x):
     log(x)
     x = tf.layers.dense(x, 10, activation=tf.nn.relu, name="fc6")
 
+    # Remove singular dimensions:
+    log(x)
+    x = tf.squeeze(x, [1, 2])
+
     log(x)
     return x

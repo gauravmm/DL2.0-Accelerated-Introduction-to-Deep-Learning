@@ -24,7 +24,10 @@ def get_shape_input():
     return (None, 32, 32, 3)
 
 def get_shape_label():
-    return (None, 10)
+    return (None,)
+
+def num_classes():
+    return 10
 
 def _unpickle_file(filename):
     logger.debug("Loading pickle file: {}".format(filename))

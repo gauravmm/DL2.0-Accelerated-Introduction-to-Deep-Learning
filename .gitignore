@@ -1,3 +1,6 @@
+# Metadata
+**/train_logs
+
 # CIFAR-10 data
 data/cifar-10-python.tar.gz
 data/cifar-10-batches-py/*
