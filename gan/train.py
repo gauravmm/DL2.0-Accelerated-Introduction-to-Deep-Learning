@@ -2,12 +2,12 @@
 # Written by Kingsley Kuan
 
 import tensorflow as tf
-from data import cifar10, infinite_data
+from data import cifar10, utilities
 import dcgan
 
 # Create CIFAR-10 input
 BATCH_SIZE = 256
-data_generator = map((lambda image, label: (image*2. - 1., label)), infinite_data.wrap(cifar10.get_train(), BATCH_SIZE))
+data_generator = map((lambda image, label: (image*2. - 1., label)), utilities.infinite_generator(cifar10.get_train(), BATCH_SIZE))
 
 # Sample noise from random normal distribution
 n_input = tf.placeholder(tf.float32, shape=cifar10.get_shape_input(), name="input")
