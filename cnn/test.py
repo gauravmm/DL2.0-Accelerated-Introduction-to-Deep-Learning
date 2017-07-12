@@ -3,7 +3,7 @@
 import logging
 
 import tensorflow as tf
-from data import cifar10, finite_data
+from data import cifar10, utilities
 
 from . import vgg
 
@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 BATCH_SIZE = 64
 
 # Data:
-data_generator = finite_data.wrap(cifar10.get_test(), BATCH_SIZE)
+data_generator = utilities.finite_generator(cifar10.get_test(), BATCH_SIZE)
 
 # Define the model:
 n_input = tf.placeholder(tf.float32, shape=cifar10.get_shape_input(), name="input")

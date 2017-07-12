@@ -3,7 +3,7 @@
 import logging
 
 import tensorflow as tf
-from data import cifar10, infinite_data
+from data import cifar10, utilities
 
 from . import vgg
 
@@ -15,7 +15,7 @@ NUM_EPOCHS = 30
 
 # Set up training data:
 NUM_BATCHES = int(NUM_EPOCHS * 50000 / BATCH_SIZE)
-data_generator = infinite_data.wrap(cifar10.get_train(), BATCH_SIZE)
+data_generator = utilities.infinite_generator(cifar10.get_train(), BATCH_SIZE)
 
 # Define the model:
 n_input = tf.placeholder(tf.float32, shape=cifar10.get_shape_input(), name="input")
