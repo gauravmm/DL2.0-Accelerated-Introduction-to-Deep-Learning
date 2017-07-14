@@ -14,13 +14,13 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 # Config:
-BATCH_SIZE = 16
-NUM_EPOCHS = 30
+BATCH_SIZE = 32
+NUM_EPOCHS = 50
 LEARNING_RATE = 0.0001
 OPTIMIZER = tf.train.AdamOptimizer(learning_rate=LEARNING_RATE)
 
 # Set up training data:
-NUM_BATCHES = int(NUM_EPOCHS * 50000 / BATCH_SIZE)
+NUM_BATCHES = int(NUM_EPOCHS * 13500 / BATCH_SIZE)
 data_generator = utilities.infinite_generator(nodules.get_train(), BATCH_SIZE)
 
 # Define the model:
@@ -46,7 +46,7 @@ inc_global_step = tf.assign(global_step, global_step+1)
 train_op = OPTIMIZER.minimize(loss)
 
 logger.info("Loading training supervisor...")
-sv = tf.train.Supervisor(logdir="train_logs_3dcnn/", global_step=global_step, summary_op=None, save_model_secs=600)
+sv = tf.train.Supervisor(logdir="train_logs_3dcnn/", global_step=global_step, summary_op=None, save_model_secs=30)
 logger.info("Done!")
 
 with sv.managed_session() as sess:
@@ -57,7 +57,7 @@ with sv.managed_session() as sess:
     logwriter = tf.summary.FileWriter("train_logs_3dcnn/", sess.graph)
     logwriter.add_session_log(tf.SessionLog(status=tf.SessionLog.START), global_step=batch)
 
-    logger.info("Starting training from batch {} to {}. Saving model every {}s.".format(batch, NUM_BATCHES, 600))
+    logger.info("Starting training from batch {} to {}. Saving model every {}s.".format(batch, NUM_BATCHES, 30))
 
     while not sv.should_stop():
         if batch >= NUM_BATCHES:

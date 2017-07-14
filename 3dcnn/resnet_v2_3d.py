@@ -223,21 +223,27 @@ def resnet_v2(inputs,
           # We do not include batch normalization or activation functions in
           # conv1 because the first ResNet unit will perform these. Cf.
           # Appendix of [2].
+          print(net.get_shape())
           with slim.arg_scope([conv3d],
                               activation=None, use_bias=True):
             net = resnet_utils.conv3d_same(net, 64, 7, stride=2, scope='conv1')
-          net = max_pooling3d(net, [3, 3, 3], strides=2, name='pool1')
+          print(net.get_shape())
+          net = max_pooling3d(net, [3, 3, 3], strides=2, padding="SAME", name='pool1')
+        print(net.get_shape())
         net = resnet_utils.stack_blocks_dense(net, blocks, output_stride)
         # This is needed because the pre-activation variant does not have batch
         # normalization or activation functions in the residual unit output. See
         # Appendix of [2].
         net = slim.batch_norm(net, activation_fn=tf.nn.relu, scope='postnorm')
+        print(net.get_shape())
         if global_pool:
           # Global average pooling.
           net = tf.reduce_mean(net, [1, 2, 3], name='pool5', keep_dims=True)
+        print(net.get_shape())
         if num_classes is not None:
           net = conv3d(net, num_classes, [1, 1, 1], activation=None,
                        use_bias=True, name='logits')
+        print(net.get_shape())
         logits = tf.squeeze(net, [1, 2, 3], name='SpatialSqueeze')
         # Convert end_points_collection into a dictionary of end_points.
         end_points = slim.utils.convert_collection_to_dict(end_points_collection)
