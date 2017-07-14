@@ -5,7 +5,11 @@ from . import model
 
 # You can just import whichever dataset you want directly:
 # Supported datasets are in the data package.
-from data import test_dataset
+from data import nodules, utilities
 
 print("Training model: {}".format(model.NAME))
-print(test_dataset.get_train().__repr__())
+
+gen = utilities.infinite_generator(nodules.get_train(), 10)
+for i in range(10):
+    x, y = next(gen)
+    print(x.shape, y.shape)
