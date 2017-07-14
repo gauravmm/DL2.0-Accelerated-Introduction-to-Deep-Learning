@@ -15,10 +15,10 @@ import urllib3
 logger = logging.getLogger(__name__)
 
 def get_train():
-    return _get_dataset("train")
+    return _get_dataset("train",nb_files)
 
 def get_test():
-    return _get_dataset("test")
+    return _get_dataset("test",nb_files)
 
 def get_shape_input():
     return (None, 32, 32, 3)
@@ -45,35 +45,13 @@ def _unpickle_file(filename):
     return img, lbl
 
 
-def _get_dataset(split):
+def _get_dataset(split, nb_files):
     assert split == "test" or split == "train"
     path = "data"
-    dirname = "cifar-10-batches-py"
-    data_url = "https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz"
+    dirname = "nodules"
 
-    if not os.path.exists(os.path.join(path, dirname)):
-        # Extract or download data
-        try:
-            os.makedirs(path)
-        except OSError as exception:
-            if exception.errno != errno.EEXIST:
-                raise
-        
-        file_path = os.path.join(path, data_url.split('/')[-1])
-        if not os.path.exists(file_path):
-            # Download
-            logger.warn("Downloading {}".format(data_url))
-            with urllib3.PoolManager().request('GET', data_url, preload_content=False) as r, \
-                 open(file_path, 'wb') as w:
-                    shutil.copyfileobj(r, w)
-
-        logger.warn("Unpacking {}".format(file_path))
-        # Unpack data
-        tarfile.open(name=file_path, mode="r:gz").extractall(path)
-
-    # Import the data
     filenames = ["test_batch"] if split == "test" else \
-                ["data_batch_{}".format(i) for i in range(1, 6)]
+                ["data_batch_{}".format(i) for i in range(1, nb_files)]
     
     imgs = []
     lbls = []
