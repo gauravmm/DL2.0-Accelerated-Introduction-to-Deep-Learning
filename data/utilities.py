@@ -35,7 +35,6 @@ def ensure_dataset_exists(files, dirname):
                 with urllib3.PoolManager().request('GET', data_url, preload_content=False) as r, \
                     open(file_path, 'wb') as w:
                         shutil.copyfileobj(r, w)
-                        rv.append(file_path)
     return rv
 
 
