@@ -1,9 +1,11 @@
 #! python3
 
 import logging
+import sys
 
 import tensorflow as tf
-from data import utilities
+sys.path.append('../data')
+import utilities
 
 from resnet_v2_3d import resnet_v2_18
 
@@ -19,18 +21,18 @@ OPTIMIZER = tf.train.AdamOptimizer(learning_rate=LEARNING_RATE)
 
 # Set up training data:
 NUM_BATCHES = int(NUM_EPOCHS * 50000 / BATCH_SIZE)
-data_generator = utilities.infinite_generator(cifar10.get_train(), BATCH_SIZE)
+#data_generator = utilities.infinite_generator(cifar10.get_train(), BATCH_SIZE)
 
 # Define the model:
-n_input = tf.placeholder(tf.float32, shape=(None, 32,32,32), name="input")
+n_input = tf.placeholder(tf.float32, shape=(None, 32,32,32,1), name="input")
 n_label = tf.placeholder(tf.int64, shape=(None,), name="label")
 
 # Build the model
-n_output = resnet_v2_18(n_input, num_classes=2)
+net, end_points = resnet_v2_18(n_input, num_classes=2, is_training=True)
 
 # Define the loss function
-loss = tf.reduce_sum(tf.nn.sparse_softmax_cross_entropy_with_logits(logits=n_output, labels=n_label, name="softmax"))
-accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.argmax(n_output, axis=1), n_label), tf.float32))
+loss = tf.reduce_sum(tf.nn.sparse_softmax_cross_entropy_with_logits(logits=net, labels=n_label, name="softmax"))
+accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.argmax(net, axis=1), n_label), tf.float32))
 
 # Add summaries to track the state of training:
 tf.summary.scalar('summary/loss', loss)
