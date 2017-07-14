@@ -5,7 +5,7 @@ import sys
 import tensorflow as tf
 
 sys.path.append('../data')
-import cifar10, infinite_data
+import cifar10, utilities
 import vgg
 
 logging.basicConfig(level=logging.INFO)
@@ -45,7 +45,7 @@ inc_global_step = tf.assign(global_step, global_step+1)
 train_op = OPTIMIZER.minimize(loss)
 
 logger.info("Loading training supervisor...")
-sv = tf.train.Supervisor(logdir="cnn/train_logs/", global_step=global_step, summary_op=None, save_model_secs=600)
+sv = tf.train.Supervisor(logdir="train_logs/", global_step=global_step, summary_op=None, save_model_secs=30)
 logger.info("Done!")
 
 with sv.managed_session() as sess:
@@ -53,15 +53,15 @@ with sv.managed_session() as sess:
     batch = sess.run(global_step)
 
     # Set up tensorboard logging:
-    logwriter = tf.summary.FileWriter("cnn/train_logs/", sess.graph)
+    logwriter = tf.summary.FileWriter("train_logs/", sess.graph)
     logwriter.add_session_log(tf.SessionLog(status=tf.SessionLog.START), global_step=batch)
 
-    logger.info("Starting training from batch {} to {}. Saving model every {}s.".format(batch, NUM_BATCHES, 600))
+    logger.info("Starting training from batch {} to {}. Saving model every {}s.".format(batch, NUM_BATCHES, 30))
 
     while not sv.should_stop():
         if batch >= NUM_BATCHES:
             logger.info("Saving...")
-            sv.saver.save(sess, "cnn/train_logs/model.ckpt", global_step=batch)
+            sv.saver.save(sess, "train_logs/model.ckpt", global_step=batch)
             sv.stop()
             break
 
