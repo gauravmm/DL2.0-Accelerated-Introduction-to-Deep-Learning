@@ -1,17 +1,23 @@
 #! python3
 
 import logging
+import sys
 
 import tensorflow as tf
-from data import cifar10, infinite_data
 
-from . import vgg
+sys.path.append('../data')
+import cifar10, infinite_data
+import vgg
 
+logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 # Config:
 BATCH_SIZE = 64
 NUM_EPOCHS = 30
+LEARNING_RATE = 0.0001
+OPTIMIZER = tf.train.AdamOptimizer(learning_rate = LEARNING_RATE)
 
 # Set up training data:
 NUM_BATCHES = int(NUM_EPOCHS * 50000 / BATCH_SIZE)
@@ -37,7 +43,7 @@ summaries = tf.summary.merge_all()
 global_step = tf.Variable(0, trainable=False, name='global_step')
 inc_global_step = tf.assign(global_step, global_step+1)
 
-train_op = tf.train.AdamOptimizer().minimize(loss)
+train_op = OPTIMIZER.minimize(loss)
 
 logger.info("Loading training supervisor...")
 sv = tf.train.Supervisor(logdir="train_logs/", global_step=global_step, summary_op=None, save_model_secs=600)
@@ -61,7 +67,7 @@ with sv.managed_session() as sess:
             break
 
         if batch > 0 and batch % 100 == 0:
-            logger.debug('Step {} of {}.'.format(batch, NUM_BATCHES))
+            logger.info('Step {} of {}.'.format(batch, NUM_BATCHES))
 
         inp, lbl = next(data_generator)
 

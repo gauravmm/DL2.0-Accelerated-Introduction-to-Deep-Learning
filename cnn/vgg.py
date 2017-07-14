@@ -1,8 +1,6 @@
-#! python3
 
 """
 Modified VGG suitable for CIFAR-10
-
 """
 
 import logging

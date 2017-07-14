@@ -52,6 +52,7 @@ def _get_dataset(split):
     data_url = "https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz"
 
     if not os.path.exists(os.path.join(path, dirname)):
+        print('no path')
         # Extract or download data
         try:
             os.makedirs(path)
