@@ -5,7 +5,7 @@ import sys
 
 import tensorflow as tf
 sys.path.append('../data')
-import utilities
+import nodules, utilities
 
 from resnet_v2_3d import resnet_v2_18
 
@@ -21,7 +21,7 @@ OPTIMIZER = tf.train.AdamOptimizer(learning_rate=LEARNING_RATE)
 
 # Set up training data:
 NUM_BATCHES = int(NUM_EPOCHS * 50000 / BATCH_SIZE)
-#data_generator = utilities.infinite_generator(cifar10.get_train(), BATCH_SIZE)
+data_generator = utilities.infinite_generator(nodules.get_train(), BATCH_SIZE)
 
 # Define the model:
 n_input = tf.placeholder(tf.float32, shape=(None, 32,32,32,1), name="input")
