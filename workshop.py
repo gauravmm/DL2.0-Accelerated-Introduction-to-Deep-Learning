@@ -4,6 +4,9 @@ import argparse
 import importlib
 import logging
 import os
+import shutil
+import urllib3
+import zipfile
 
 import data
 
@@ -36,7 +39,7 @@ def run(args):
 
     if args.pretrained:
         if args.example:
-            download_pretrained(example)
+            download_pretrained(args.example)
         else:
             for example in ["cnn", "gan"]:
                 download_pretrained(example)
@@ -59,11 +62,46 @@ def download_data():
     from data import nodules, cifar10, yt8m
 
     for mod in [nodules, cifar10, yt8m]:
-        print("Downloading: {}".format(mod.__name__))
+        logger.info("Downloading dataset: {}".format(mod.__name__))
         mod.get_train()
         mod.get_test()
 
 def download_pretrained(example):
+    logger.info("Downloading pretrained weights for: {}".format(example))
+
+    data_url = "http://10.217.128.198/pretrained/{}.zip".format(example)
+    # Check if .../example/ exists
+    if not os.path.isdir(example):
+        logger.error("Example {} does not exist.".format(example))
+        return
+
+    logs_path = os.path.join(example, "train_logs")
+    file_path = os.path.join(example, "train_logs.zip")
+
+    # Try to delete the directory
+    try:
+        shutil.rmtree(logs_path)
+    except:
+        pass
+
+    # Recreate the directory
+    try:
+        os.mkdir(logs_path)
+    except Exception as e:
+        logger.error("Error creating directory {}.".format(logs_path))
+        logger.exception(e)
+        return
+
+    # Download
+    logger.warn("Downloading {}".format(data_url))
+    with urllib3.PoolManager().request('GET', data_url, preload_content=False) as r, open(file_path, 'wb') as w:
+        shutil.copyfileobj(r, w)
+    logger.warn("Unpacking {}".format(file_path))
+    # Unpack data
+    with zipfile.ZipFile(file_path, 'r') as zipf:
+        zipf.extractall(logs_path)
+    os.remove(file_path)
+
     pass
 
 
