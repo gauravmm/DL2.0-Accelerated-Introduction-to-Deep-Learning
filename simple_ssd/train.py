@@ -6,10 +6,14 @@ Trains SSD object detector on Kitti data.
 Author: Kingsley Kuan
 """
 
+import os 
+import sys 
+sys.path.append(os.path.dirname(__file__))
+
 import argparse
 import tensorflow as tf
-from simple_ssd import data_reader
-from simple_ssd import ssd
+import data_reader
+import ssd
 
 NUM_CLASSES = 4
 

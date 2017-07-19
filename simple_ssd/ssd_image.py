@@ -8,7 +8,7 @@ import math
 import numpy as np
 import tensorflow as tf
 from PIL import Image
-from simple_ssd.bounding_box import BoundingBox
+from bounding_box import BoundingBox
 
 LABELS = ['Background', 'Car', 'Pedestrian', 'Cyclist']
 LABEL_IDS = dict(zip(LABELS, range(len(LABELS))))

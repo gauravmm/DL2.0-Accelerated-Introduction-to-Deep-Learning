@@ -11,7 +11,7 @@ Author: Kingsley Kuan
 """
 
 import tensorflow as tf
-from simple_ssd import resnet
+import resnet
 
 kernel_init = tf.contrib.layers.variance_scaling_initializer()
 kernel_reg = tf.contrib.layers.l2_regularizer(0.00001)

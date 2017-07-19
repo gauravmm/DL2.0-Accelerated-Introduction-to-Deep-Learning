@@ -9,7 +9,7 @@ Author: Kingsley Kuan
 import argparse
 import os
 import tensorflow as tf
-from simple_ssd.ssd_image import SSDImage
+from ssd_image import SSDImage
 
 def parse_args():
     parser = argparse.ArgumentParser()

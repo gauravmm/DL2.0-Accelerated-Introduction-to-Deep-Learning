@@ -6,14 +6,18 @@ Predicts object locations on a single image.
 Author: Kingsley Kuan
 """
 
+import os 
+import sys 
+sys.path.append(os.path.dirname(__file__))
+
 import argparse
 import os
 import math
 import tensorflow as tf
 import numpy as np
 from PIL import Image, ImageDraw
-from simple_ssd import ssd
-from simple_ssd import bounding_box
+import ssd
+import bounding_box
 
 IMAGE_WIDTH = 1242
 IMAGE_HEIGHT = 375
