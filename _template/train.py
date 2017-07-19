@@ -5,7 +5,10 @@ from . import model
 
 # You can just import whichever dataset you want directly:
 # Supported datasets are in the data package.
-from data import test_dataset
+from data import yt8m, utilities
 
 print("Training model: {}".format(model.NAME))
-print(test_dataset.get_train().__repr__())
+
+# Get .tfrecord files
+for s in yt8m.get_train():
+    print(s)
