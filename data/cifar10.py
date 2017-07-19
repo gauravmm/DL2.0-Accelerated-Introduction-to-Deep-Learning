@@ -37,6 +37,7 @@ def _unpickle_file(filename):
 
     # Reorder the data
     img = data[b'data']
+    print(img.shape)
     img = img.reshape([-1, 3, 32, 32])
     img = img.transpose([0, 2, 3, 1])
     # Load labels
@@ -52,6 +53,7 @@ def _get_dataset(split):
     data_url = "http://10.217.128.198/datasets/cifar-10-python.tar.gz"
 
     if not os.path.exists(os.path.join(path, dirname)):
+        print('no path')
         # Extract or download data
         try:
             os.makedirs(path)

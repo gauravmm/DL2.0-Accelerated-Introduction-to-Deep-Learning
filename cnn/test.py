@@ -3,10 +3,12 @@
 import logging
 
 import tensorflow as tf
-from data import cifar10, utilities
 
+from data import cifar10, utilities
 from . import vgg
 
+logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 # Config:
