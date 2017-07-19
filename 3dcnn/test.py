@@ -1,13 +1,11 @@
 #! python3
 
 import logging
-import sys
 
 import tensorflow as tf
-sys.path.append('../data')
-import nodules, utilities
+from data import nodules, utilities
 
-from resnet_v2_3d import resnet_v2_18
+from . import resnet_v2_3d as resnet
 
 logging.basicConfig(level=logging.INFO)
 logging.basicConfig(level=logging.DEBUG)
@@ -24,16 +22,16 @@ n_input = tf.placeholder(tf.float32, shape=nodules.get_shape_input(), name="inpu
 n_label = tf.placeholder(tf.int64, shape=nodules.get_shape_label(), name="label")
 
 # Build the model
-net, end_points = resnet_v2_18(n_input, num_classes=2, is_training=False)
+net, end_points = resnet.resnet_v2_18(n_input, num_classes=2, is_training=False)
 accuracy = tf.reduce_sum(tf.cast(tf.equal(tf.argmax(net, axis=1), n_label), tf.int32))
 global_step = tf.Variable(0, trainable=False, name='global_step')
 
 # Model loader
 pre_train_saver = tf.train.Saver()
-load_pretrain = lambda sess: pre_train_saver.restore(sess, "train_logs_3dcnn/")
+load_pretrain = lambda sess: pre_train_saver.restore(sess, "3dcnn/train_logs_3dcnn/")
 
 logger.info("Loading training supervisor...")
-sv = tf.train.Supervisor(logdir="train_logs_3dcnn/", init_fn=load_pretrain, global_step=global_step, summary_op=None, save_model_secs=None)
+sv = tf.train.Supervisor(logdir="3dcnn/train_logs_3dcnn/", init_fn=load_pretrain, global_step=global_step, summary_op=None, save_model_secs=None)
 logger.info("Done!")
 
 with sv.managed_session() as sess:

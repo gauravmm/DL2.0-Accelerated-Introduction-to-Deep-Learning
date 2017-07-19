@@ -1,13 +1,11 @@
 #! python3
 
 import logging
-import sys
 
 import tensorflow as tf
-sys.path.append('../data')
-import nodules, utilities
+from data import nodules, utilities
 
-from resnet_v2_3d import resnet_v2_18
+from . import resnet_v2_3d as resnet
 
 logging.basicConfig(level=logging.INFO)
 logging.basicConfig(level=logging.DEBUG)
@@ -18,9 +16,10 @@ BATCH_SIZE = 32
 NUM_EPOCHS = 50
 LEARNING_RATE = 0.0001
 OPTIMIZER = tf.train.AdamOptimizer(learning_rate=LEARNING_RATE)
+DATASET_SIZE = 13500
 
 # Set up training data:
-NUM_BATCHES = int(NUM_EPOCHS * 13500 / BATCH_SIZE)
+NUM_BATCHES = int(NUM_EPOCHS * DATASET_SIZE / BATCH_SIZE)
 data_generator = utilities.infinite_generator(nodules.get_train(), BATCH_SIZE)
 
 # Define the model:
@@ -28,7 +27,7 @@ n_input = tf.placeholder(tf.float32, shape=(None, 32,32,32,1), name="input")
 n_label = tf.placeholder(tf.int64, shape=(None,), name="label")
 
 # Build the model
-net, end_points = resnet_v2_18(n_input, num_classes=2, is_training=True)
+net, end_points = resnet.resnet_v2_18(n_input, num_classes=2, is_training=True)
 
 # Define the loss function
 loss = tf.reduce_sum(tf.nn.sparse_softmax_cross_entropy_with_logits(logits=net, labels=n_label, name="softmax"))
@@ -46,7 +45,7 @@ inc_global_step = tf.assign(global_step, global_step+1)
 train_op = OPTIMIZER.minimize(loss)
 
 logger.info("Loading training supervisor...")
-sv = tf.train.Supervisor(logdir="train_logs_3dcnn/", global_step=global_step, summary_op=None, save_model_secs=30)
+sv = tf.train.Supervisor(logdir="3dcnn/train_logs_3dcnn/", global_step=global_step, summary_op=None, save_model_secs=30)
 logger.info("Done!")
 
 with sv.managed_session() as sess:
@@ -54,7 +53,7 @@ with sv.managed_session() as sess:
     batch = sess.run(global_step)
 
     # Set up tensorboard logging:
-    logwriter = tf.summary.FileWriter("train_logs_3dcnn/", sess.graph)
+    logwriter = tf.summary.FileWriter("3dcnn/train_logs_3dcnn/", sess.graph)
     logwriter.add_session_log(tf.SessionLog(status=tf.SessionLog.START), global_step=batch)
 
     logger.info("Starting training from batch {} to {}. Saving model every {}s.".format(batch, NUM_BATCHES, 30))
@@ -62,7 +61,7 @@ with sv.managed_session() as sess:
     while not sv.should_stop():
         if batch >= NUM_BATCHES:
             logger.info("Saving...")
-            sv.saver.save(sess, "train_logs_3dcnn/model.ckpt", global_step=batch)
+            sv.saver.save(sess, "3dcnn/train_logs_3dcnn/model.ckpt", global_step=batch)
             sv.stop()
             break
 
