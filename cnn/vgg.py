@@ -20,7 +20,6 @@ def build(x):
     with tf.variable_scope('conv1'):
         x = tf.layers.conv2d(x, 64, (3, 3), padding=pad, activation=tf.nn.relu, name="conv1_1")
         x = tf.layers.conv2d(x, 64, (3, 3), padding=pad, activation=tf.nn.relu, name="conv1_2")
-        print(x.get_shape())
         x = tf.layers.max_pooling2d(x, (2, 2), (2, 2), name="pool1")
 
     log(x)
