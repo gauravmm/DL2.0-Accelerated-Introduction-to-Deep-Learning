@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 # Config:
-BATCH_SIZE = 16
+BATCH_SIZE = 32
 
 # Data:
 data_generator = utilities.finite_generator(nodules.get_test(), BATCH_SIZE)
@@ -23,20 +23,22 @@ n_label = tf.placeholder(tf.int64, shape=nodules.get_shape_label(), name="label"
 
 # Build the model
 net, end_points = resnet.resnet_v2_18(n_input, num_classes=2, is_training=False)
-accuracy = tf.reduce_sum(tf.cast(tf.equal(tf.argmax(net, axis=1), n_label), tf.int32))
+softmax = tf.nn.softmax(net)
+accuracy = tf.reduce_sum(tf.cast(tf.equal(tf.argmax(softmax, axis=1), n_label), tf.int32))
 global_step = tf.Variable(0, trainable=False, name='global_step')
 
 # Model loader
 pre_train_saver = tf.train.Saver()
-load_pretrain = lambda sess: pre_train_saver.restore(sess, "3dcnn/train_logs_3dcnn/")
+load_pretrain = lambda sess: pre_train_saver.restore(sess, "3dcnn/train_logs/")
 
 logger.info("Loading training supervisor...")
-sv = tf.train.Supervisor(logdir="3dcnn/train_logs_3dcnn/", init_fn=load_pretrain, global_step=global_step, summary_op=None, save_model_secs=None)
+sv = tf.train.Supervisor(logdir="3dcnn/train_logs/", init_fn=load_pretrain, global_step=global_step, summary_op=None, save_model_secs=None)
 logger.info("Done!")
 
 with sv.managed_session() as sess:
     batch = sess.run(global_step)
     correct = 0
+    correct_bis = 0
     total = 0
     logger.info("Testing performance from batch {}.".format(batch))
 
@@ -50,6 +52,8 @@ with sv.managed_session() as sess:
                 n_input: inp,
                 n_label: lbl
             })
+            predictions = sess.run(softmax, feed_dict={n_input: inp})
+            print(predictions)
     except StopIteration:
         logger.info("Done!")
         logger.info("{:d}/{:d} correct; {:.2f}%".format(correct, total, 100.0*correct/float(total)))

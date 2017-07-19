@@ -2,7 +2,7 @@ import logging
 
 import numpy as np
 
-import utilities
+from . import utilities
 
 logger = logging.getLogger(__name__)
 
