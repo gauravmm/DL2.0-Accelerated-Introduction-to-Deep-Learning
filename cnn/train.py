@@ -12,9 +12,12 @@ logger = logging.getLogger(__name__)
 # Config:
 BATCH_SIZE = 64
 NUM_EPOCHS = 30
+LEARNING_RATE = 0.0001
+OPTIMIZER = tf.train.AdamOptimizer(learning_rate = LEARNING_RATE)
+DATASET_SIZE = 50000
 
 # Set up training data:
-NUM_BATCHES = int(NUM_EPOCHS * 50000 / BATCH_SIZE)
+NUM_BATCHES = int(NUM_EPOCHS * DATASET_SIZE / BATCH_SIZE)
 data_generator = utilities.infinite_generator(cifar10.get_train(), BATCH_SIZE)
 
 # Define the placeholders:
@@ -37,10 +40,10 @@ summaries = tf.summary.merge_all()
 global_step = tf.Variable(0, trainable=False, name='global_step')
 inc_global_step = tf.assign(global_step, global_step+1)
 
-train_op = tf.train.AdamOptimizer().minimize(loss)
+train_op = OPTIMIZER.minimize(loss)
 
 logger.info("Loading training supervisor...")
-sv = tf.train.Supervisor(logdir="cnn/train_logs/", global_step=global_step, summary_op=None, save_model_secs=600)
+sv = tf.train.Supervisor(logdir="cnn/train_logs/", global_step=global_step, summary_op=None, save_model_secs=30)
 logger.info("Done!")
 
 with sv.managed_session() as sess:
@@ -51,7 +54,7 @@ with sv.managed_session() as sess:
     logwriter = tf.summary.FileWriter("cnn/train_logs/", sess.graph)
     logwriter.add_session_log(tf.SessionLog(status=tf.SessionLog.START), global_step=batch)
 
-    logger.info("Starting training from batch {} to {}. Saving model every {}s.".format(batch, NUM_BATCHES, 600))
+    logger.info("Starting training from batch {} to {}. Saving model every {}s.".format(batch, NUM_BATCHES, 30))
 
     while not sv.should_stop():
         if batch >= NUM_BATCHES:
@@ -61,7 +64,7 @@ with sv.managed_session() as sess:
             break
 
         if batch > 0 and batch % 100 == 0:
-            logger.debug('Step {} of {}.'.format(batch, NUM_BATCHES))
+            logger.info('Step {} of {}.'.format(batch, NUM_BATCHES))
 
         inp, lbl = next(data_generator)
 
