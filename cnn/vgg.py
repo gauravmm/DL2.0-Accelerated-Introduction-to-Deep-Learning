@@ -9,6 +9,8 @@ import tensorflow as tf
 
 logger = logging.getLogger(__name__)
 
+pad = 'SAME'
+
 def build(x):
     assert str(x.get_shape()) == "(?, 32, 32, 3)"
     logger.info("Building VGG model")
@@ -17,20 +19,23 @@ def build(x):
 
     log(x)
     with tf.variable_scope('conv1'):
-        x = tf.layers.conv2d(x, 64, (3, 3), activation=tf.nn.relu, name="conv1_1")
-        x = tf.layers.conv2d(x, 64, (1, 1), activation=tf.nn.relu, name="conv1_2")
+        x = tf.layers.conv2d(x, 64, (3, 3), padding = pad, activation=tf.nn.relu, name="conv1_1")
+        x = tf.layers.conv2d(x, 64, (3, 3), padding = pad, activation=tf.nn.relu, name="conv1_2")
+        print(x.get_shape())
         x = tf.layers.max_pooling2d(x, (2, 2), (2, 2), name="pool1")
 
     log(x)
     with tf.variable_scope('conv2'):
-        x = tf.layers.conv2d(x, 128, (3, 3), activation=tf.nn.relu, name="conv2_1")
-        x = tf.layers.conv2d(x, 128, (1, 1), activation=tf.nn.relu, name="conv2_2")
+        x = tf.layers.conv2d(x, 128, (3, 3), padding = pad, activation=tf.nn.relu, name="conv2_1")
+        x = tf.layers.conv2d(x, 128, (3, 3), padding = pad, activation=tf.nn.relu, name="conv2_2")
         x = tf.layers.max_pooling2d(x, (2, 2), (2, 2), name="pool2")
 
     log(x)
     with tf.variable_scope('conv3'):
-        x = tf.layers.conv2d(x, 256, (3, 3), activation=tf.nn.relu, name="conv3_1")
-        x = tf.layers.conv2d(x, 256, (2, 2), activation=tf.nn.relu, name="conv3_2")
+        x = tf.layers.conv2d(x, 256, (3, 3), padding = pad, activation=tf.nn.relu, name="conv3_1")
+        x = tf.layers.conv2d(x, 256, (3, 3), activation=tf.nn.relu, name="conv3_2")
+        x = tf.layers.conv2d(x, 256, (3, 3), activation=tf.nn.relu, name="conv3_3")
+        x = tf.layers.conv2d(x, 256, (3, 3), activation=tf.nn.relu, name="conv3_4")
         x = tf.layers.max_pooling2d(x, (2, 2), (2, 2), name="pool3")
 
     log(x)

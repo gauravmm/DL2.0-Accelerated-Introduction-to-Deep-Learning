@@ -1,13 +1,11 @@
 #! python3
 
 import logging
-import sys
 
 import tensorflow as tf
 
-sys.path.append('../data')
-import cifar10, utilities
-import vgg
+from data import cifar10, utilities
+from . import vgg
 
 logging.basicConfig(level=logging.INFO)
 logging.basicConfig(level=logging.DEBUG)
@@ -30,10 +28,10 @@ global_step = tf.Variable(0, trainable=False, name='global_step')
 
 # Model loader
 pre_train_saver = tf.train.Saver()
-load_pretrain = lambda sess: pre_train_saver.restore(sess, "train_logs/")
+load_pretrain = lambda sess: pre_train_saver.restore(sess, "cnn/train_logs/")
 
 logger.info("Loading training supervisor...")
-sv = tf.train.Supervisor(logdir="train_logs/", init_fn=load_pretrain, global_step=global_step, summary_op=None, save_model_secs=None)
+sv = tf.train.Supervisor(logdir="cnn/train_logs/", init_fn=load_pretrain, global_step=global_step, summary_op=None, save_model_secs=None)
 logger.info("Done!")
 
 with sv.managed_session() as sess:
