@@ -5,6 +5,8 @@ import logging
 import tensorflow as tf
 from data import nodules, utilities
 
+slim = tf.contrib.slim
+
 from . import resnet_v2_3d as resnet
 
 logging.basicConfig(level=logging.INFO)
@@ -22,7 +24,8 @@ n_input = tf.placeholder(tf.float32, shape=nodules.get_shape_input(), name="inpu
 n_label = tf.placeholder(tf.int64, shape=nodules.get_shape_label(), name="label")
 
 # Build the model
-net, end_points = resnet.resnet_v2_18(n_input, num_classes=2, is_training=False)
+with slim.arg_scope(resnet.resnet_arg_scope()):
+    net, end_points = resnet.resnet_v2_18(n_input, num_classes=2, is_training=False)
 softmax = tf.nn.softmax(net)
 accuracy = tf.reduce_sum(tf.cast(tf.equal(tf.argmax(softmax, axis=1), n_label), tf.int32))
 global_step = tf.Variable(0, trainable=False, name='global_step')
