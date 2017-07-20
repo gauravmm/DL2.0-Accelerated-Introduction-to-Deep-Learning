@@ -4,14 +4,18 @@
 import tensorflow as tf
 from data import cifar10, utilities
 from . import dcgan
+import logging
+
+logger = logging.getLogger("gan.train")
 
 # Create CIFAR-10 input
 BATCH_SIZE = 256
 data_generator = map((lambda inp: (inp[0]*2. - 1., inp[1])), utilities.infinite_generator(cifar10.get_train(), BATCH_SIZE))
 
-# Sample noise from random normal distribution
-n_input = tf.placeholder(tf.float32, shape=cifar10.get_shape_input(), name="input")
+# Input images
+input_placeholder = tf.placeholder(tf.float32, shape=cifar10.get_shape_input(), name="input")
 
+# Sample noise from random normal distribution
 random_z = tf.random_normal([BATCH_SIZE, 100], mean=0.0, stddev=1.0,
                             name='random_z')
 
@@ -19,7 +23,7 @@ random_z = tf.random_normal([BATCH_SIZE, 100], mean=0.0, stddev=1.0,
 generator = dcgan.generator(random_z, is_training=True, name='generator')
 
 # Pass real and fake images into discriminator separately
-real_discriminator = dcgan.discriminator(n_input, is_training=True,
+real_discriminator = dcgan.discriminator(input_placeholder, is_training=True,
                                          name='discriminator')
 fake_discriminator = dcgan.discriminator(generator, is_training=True,
                                          reuse=True, name='discriminator')
@@ -71,13 +75,13 @@ generator_update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS,
 global_step = tf.Variable(0, name='global_step', trainable=False)
 
 with tf.control_dependencies(discriminator_update_ops):
-    train_discriminator = tf.train. \
+train_discriminator = tf.train. \
                           AdamOptimizer(learning_rate=0.0002, beta1=0.5). \
                           minimize(discriminator_loss,
                                    var_list=discriminator_variables)
 
 with tf.control_dependencies(generator_update_ops):
-    train_generator = tf.train. \
+train_generator = tf.train. \
                       AdamOptimizer(learning_rate=0.0002, beta1=0.5). \
                       minimize(generator_loss, global_step=global_step,
                                var_list=generator_variables)
