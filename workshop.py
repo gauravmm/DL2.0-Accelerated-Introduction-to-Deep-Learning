@@ -41,7 +41,7 @@ def run(args):
         if args.example:
             download_pretrained(args.example)
         else:
-            for example in ["cnn", "gan"]:
+            for example in ["cnn", "gan", "simple_ssd", "textcnn"]:
                 download_pretrained(example)
         has_effect = True
 
@@ -59,9 +59,9 @@ def run(args):
             logger.error("Script halted without any effect. To run code, use command:\npython3 workshop.py <example name> {train, test}")
 
 def download_data():
-    from data import nodules, cifar10, yt8m
+    from data import nodules, cifar10, yt8m, simple_ssd, textcnn
 
-    for mod in [nodules, cifar10, yt8m]:
+    for mod in [nodules, cifar10, yt8m, simple_ssd, textcnn]:
         logger.info("Downloading dataset: {}".format(mod.__name__))
         mod.get_train()
         mod.get_test()
