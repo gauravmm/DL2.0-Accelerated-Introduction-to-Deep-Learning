@@ -5,11 +5,10 @@ from . import model
 
 # You can just import whichever dataset you want directly:
 # Supported datasets are in the data package.
-from data import nodules, utilities
+from data import yt8m, utilities
 
 print("Training model: {}".format(model.NAME))
 
-gen = utilities.infinite_generator(nodules.get_train(), 10)
-for i in range(10):
-    x, y = next(gen)
-    print(x.shape, y.shape)
+# Get .tfrecord files
+for s in yt8m.get_train():
+    print(s)

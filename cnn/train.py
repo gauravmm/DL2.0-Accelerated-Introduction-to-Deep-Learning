@@ -17,7 +17,7 @@ NUM_EPOCHS = 30
 NUM_BATCHES = int(NUM_EPOCHS * 50000 / BATCH_SIZE)
 data_generator = utilities.infinite_generator(cifar10.get_train(), BATCH_SIZE)
 
-# Define the model:
+# Define the placeholders:
 n_input = tf.placeholder(tf.float32, shape=cifar10.get_shape_input(), name="input")
 n_label = tf.placeholder(tf.int64, shape=cifar10.get_shape_label(), name="label")
 
