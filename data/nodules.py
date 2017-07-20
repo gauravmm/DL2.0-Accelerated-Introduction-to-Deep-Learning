@@ -2,7 +2,7 @@ import logging
 
 import numpy as np
 
-from data import utilities
+from . import utilities
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +17,7 @@ def get_test():
     return _load_file(fn)
 
 def get_shape_input():
-    return (None, 32, 32, 32)
+    return (None, 32, 32, 32, 1)
 
 def get_shape_label():
     return (None,)
@@ -32,4 +32,4 @@ def _get_files(split):
 
 def _load_file(fn):
     with np.load(fn) as data:
-        return (data["data"], data["labels"])
+        return ((np.expand_dims(data["data"], axis=-1) - (-5.47))/(24.2 -(-5.47)), data["labels"])
