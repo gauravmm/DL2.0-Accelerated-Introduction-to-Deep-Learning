@@ -3,16 +3,16 @@
 
 import tensorflow as tf
 from data import cifar10, utilities
-import dcgan
+from . import dcgan
 
 # Create CIFAR-10 input
 BATCH_SIZE = 256
-data_generator = map((lambda image, label: (image*2. - 1., label)), utilities.infinite_generator(cifar10.get_train(), BATCH_SIZE))
+data_generator = map((lambda inp: (inp[0]*2. - 1., inp[1])), utilities.infinite_generator(cifar10.get_train(), BATCH_SIZE))
 
 # Sample noise from random normal distribution
 n_input = tf.placeholder(tf.float32, shape=cifar10.get_shape_input(), name="input")
 
-random_z = tf.random_normal([batch_size, 100], mean=0.0, stddev=1.0,
+random_z = tf.random_normal([BATCH_SIZE, 100], mean=0.0, stddev=1.0,
                             name='random_z')
 
 # Generate images with generator
@@ -26,11 +26,11 @@ fake_discriminator = dcgan.discriminator(generator, is_training=True,
 
 # Calculate seperate losses for discriminator with real and fake images
 real_discriminator_loss = tf.losses.sigmoid_cross_entropy(
-    tf.constant(1, shape=[batch_size]),
+    tf.constant(1, shape=[BATCH_SIZE]),
     real_discriminator,
     scope='real_discriminator_loss')
 fake_discriminator_loss = tf.losses.sigmoid_cross_entropy(
-    tf.constant(0, shape=[batch_size]),
+    tf.constant(0, shape=[BATCH_SIZE]),
     fake_discriminator,
     scope='fake_discriminator_loss')
 
@@ -39,7 +39,7 @@ discriminator_loss = real_discriminator_loss + fake_discriminator_loss
 
 # Calculate loss for generator by flipping label on discriminator output
 generator_loss = tf.losses.sigmoid_cross_entropy(
-    tf.constant(1, shape=[batch_size]),
+    tf.constant(1, shape=[BATCH_SIZE]),
     fake_discriminator,
     scope='generator_loss')
 

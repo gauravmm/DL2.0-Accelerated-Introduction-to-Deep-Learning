@@ -3,7 +3,7 @@
 
 import tensorflow as tf
 from data import cifar10, utilities
-import dcgan
+from . import dcgan
 
 # Create CIFAR-10 input
 BATCH_SIZE = 256
@@ -12,7 +12,7 @@ data_generator = map((lambda image, label: (image*2. - 1., label)), utilities.in
 # Sample noise from random normal distribution
 n_input = tf.placeholder(tf.float32, shape=cifar10.get_shape_input(), name="input")
 
-random_z = tf.random_normal([batch_size, 100], mean=0.0, stddev=1.0, name='random_z')
+random_z = tf.random_normal([BATCH_SIZE, 100], mean=0.0, stddev=1.0, name='random_z')
 
 # Generate images with generator
 generator = dcgan.generator(random_z, is_training=True, name='generator')
